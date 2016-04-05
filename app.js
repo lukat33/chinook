@@ -4,12 +4,13 @@ if (!process.env.PORT)
 /* initialization of Chinook database */
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('chinook.sl3');
+var itemsPerPage = 20
 
 /* calls callback with specified page's artists and artist's details */
 var artists = function(page, artist, details, callback) {
   db.all("SELECT Artist.ArtistId, Name, StarsNo " +
     "FROM Artist, Stars WHERE Artist.ArtistId = Stars.ArtistId " +
-    "ORDER BY Name LIMIT 33 OFFSET ($page - 1) * 33",
+    "ORDER BY Name LIMIT "+itemsPerPage+" OFFSET ($page - 1) * "+ itemsPerPage,
     {$page: page}, function(error, rows) {
       if (error) {
         console.log(error);
@@ -18,7 +19,7 @@ var artists = function(page, artist, details, callback) {
         var result = '<div id="artists">';
         for (var i = 0; i < rows.length; i++) {
           var selected = rows[i].ArtistId == artist;
-          result += '<div id="' + rows[i].ArtistId + '"><span class="numbers">' + (page * 33 + i - 32) + '.</span>' +
+          result += '<div id="' + rows[i].ArtistId + '"><span class="numbers">' + (page * itemsPerPage + i - itemsPerPage) + '.</span>' +
             '<a href="/artists/' + page + (!selected? '/details/' + rows[i].ArtistId: '') + '#' + rows[i].ArtistId + '">' +
             '<button type="button" class="btn btn-default' + (selected? ' selected': '') + '">' +
             rows[i].Name + '</button></a><span class="stars">';
@@ -187,7 +188,7 @@ app.get('/pages', function(request, response) {
       console.log(error);
       response.sendStatus(500);
     } else
-      response.send({pages: Math.ceil(row.Artists / 33)});
+      response.send({pages: Math.ceil(row.Artists / itemsPerPage)});
   });
 });
 
