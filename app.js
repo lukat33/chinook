@@ -191,4 +191,12 @@ app.get('/pages', function(request, response) {
   });
 });
 
+// pogon streznika
+app.get('/', function(request, response) {
+  response.redirect('/artists/1');
+});
+
+app.listen(process.env.PORT, function() {
+  console.log("Streznik je pognan!");
+});
 
